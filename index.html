@@ -8,8 +8,9 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&family=Shippori+Mincho:wght@500;600;700&display=swap" rel="stylesheet">
-<script src="index.js"></script>
-<link rel="stylesheet" href="index.css">
+<script src="nihongo.js"></script>
+
+<link rel="stylesheet" href="style.css">
 </head>
 
 <body>
@@ -359,7 +360,7 @@ function setHero(mode, animate){
   orbNext();
 }
 const reduceMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-if(!reduceMotion) setInterval(orbNext, 2800);
+setInterval(orbNext, reduceMotion ? 4500 : 2800);
 
 /* ---------- Chuyển chế độ ---------- */
 const modeRow = document.getElementById("modeRow");
