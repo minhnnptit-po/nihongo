@@ -341,7 +341,7 @@ body{
 
 .controls{
   display:flex; flex-wrap:wrap; justify-content:center; gap:8px;
-  max-height:130px;
+  max-height:150px;
   margin:12px 0 0;
 }
 .topbar.collapsed .progress-wrap{max-height:0; opacity:0; margin:0 6px;}
@@ -786,6 +786,20 @@ footer{
   .tf-fb{grid-area:fb;}
   .tf-result-head .chip{margin-left:0;}
   .progress-label{font-size:12.5px;}
+  .topbar .controls{
+    flex-wrap:nowrap;
+    justify-content:flex-start;
+    overflow-x:auto;
+    overflow-y:hidden;
+    padding:3px 4px;
+    margin-left:-4px;
+    margin-right:-4px;
+    scrollbar-width:none;
+    -webkit-overflow-scrolling:touch;
+  }
+  .topbar .controls::-webkit-scrollbar{display:none;}
+  .topbar .controls .chip{flex:0 0 auto;}
+  .topbar .controls .chip.reset{margin-left:0;}
 }
 @media (max-width:480px){
   .grid{grid-template-columns:repeat(auto-fill,minmax(100px,1fr)); gap:10px;}
@@ -801,7 +815,15 @@ footer{
   .tf-submit{padding:7px 16px;}
   .section-title{flex-wrap:wrap; gap:8px 12px;}
 }
+@keyframes orbFade{from{opacity:0;} to{opacity:1;}}
 @media (prefers-reduced-motion:reduce){
-  *,*::before,*::after{animation:none !important; transition-duration:.01ms !important;}
   html{scroll-behavior:auto;}
+  /* Chỉ tắt các chuyển động lớn chạy liên tục. Quả cầu vẫn đổi chữ bằng hiệu ứng mờ dần. */
+  .bg i,
+  .hero-orb,
+  .orb-glass,
+  .orb-swirl::before,
+  .progress-fill::before{animation:none !important;}
+  .orb-kana.in{animation:orbFade .6s ease backwards !important;}
+  .orb-romaji.in{animation:orbFade .6s .35s ease backwards !important;}
 }
