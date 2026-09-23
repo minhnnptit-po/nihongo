@@ -3,14 +3,13 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="theme-color" content="#0B0A10">
+<meta name="theme-color" content="#F5F2EC">
 <title>Luyện tập Nihongo → Romaji</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&family=Shippori+Mincho:wght@500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800&family=Zen+Maru+Gothic:wght@400;500;700&display=swap" rel="stylesheet">
 <script src="nihongo.js"></script>
-
-<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="nihongo.css">
 </head>
 
 <body>
@@ -48,6 +47,7 @@ gõ romaji.</h1>
     <button class="mode-btn active" data-mode="hiragana" aria-pressed="true"><span class="k" lang="ja">あ</span><span>Hiragana</span></button>
     <button class="mode-btn" data-mode="katakana" aria-pressed="false"><span class="k" lang="ja">ア</span><span>Katakana</span></button>
     <button class="mode-btn" data-mode="teform" aria-pressed="false"><span class="k" lang="ja">て</span><span>Thể て</span></button>
+    <button class="mode-btn" data-mode="kanji" aria-pressed="false"><span class="k" lang="ja">漢</span><span>Kanji N5</span></button>
   </div>
 
   <div class="progress-wrap">
@@ -76,6 +76,7 @@ gõ romaji.</h1>
 
 <main id="main-hiragana"></main>
 <main id="main-katakana" class="hidden"></main>
+<main id="main-kanji" class="hidden"></main>
 
 <main id="main-teform" class="hidden">
   <section class="section">
@@ -110,19 +111,27 @@ const GROUP_TITLES = {
   gojuon: "Bảng cơ bản (Gojūon)",
   dakuten: "Đục âm & Bán đục âm (Dakuten / Handakuten)",
   yoon: "Âm ghép (Yōon)",
-  vidu: "Ví dụ - Từ vựng ứng dụng"
+  vidu: "Ví dụ - Từ vựng ứng dụng",
+  n5: "102 Hán tự N5 (JLPT)"
 };
 
 const MODES = {
   hiragana: { items: HIRAGANA, mainId: "main-hiragana" },
   katakana: { items: KATAKANA, mainId: "main-katakana" },
-  teform:   { items: null,       mainId: "main-teform" }
+  teform:   { items: null,       mainId: "main-teform" },
+  kanji:    { items: KANJI,      mainId: "main-kanji" }
 };
 
 const countKana = (o) => Object.values(o).reduce((s,g)=>s+g.length,0);
 const TOTAL = countKana(HIRAGANA);
-const correctCount = { hiragana: 0, katakana: 0, teform: 0 };
-const PROGRESS_SUFFIX = { hiragana: "đã đúng", katakana: "đã đúng", teform: "đã làm" };
+const MODE_TOTALS = {
+  hiragana: countKana(HIRAGANA),
+  katakana: countKana(KATAKANA),
+  teform: て.length,
+  kanji: countKana(KANJI)
+};
+const correctCount = { hiragana: 0, katakana: 0, teform: 0, kanji: 0 };
+const PROGRESS_SUFFIX = { hiragana: "đã đúng", katakana: "đã đúng", teform: "đã làm", kanji: "đã đúng" };
 let hideCorrect = false;
 let currentFilter = "all";
 let currentMode = "hiragana";
@@ -195,8 +204,8 @@ function buildSection(mode, key, items){
     input.autocomplete = "off";
     input.autocapitalize = "off";
     input.spellcheck = false;
-    input.placeholder = "romaji...";
-    input.setAttribute("aria-label", `Romaji của ${kana}`);
+    input.placeholder = mode === "kanji" ? "âm Hán Việt..." : "romaji...";
+    input.setAttribute("aria-label", mode === "kanji" ? `Âm Hán Việt của ${kana}` : `Romaji của ${kana}`);
 
     const fb = document.createElement("div");
     fb.className = "fb";
@@ -264,7 +273,7 @@ function buildSection(mode, key, items){
 }
 
 function updateProgress(){
-  const total = currentMode === "teform" ? て.length : TOTAL;
+  const total = MODE_TOTALS[currentMode] ?? TOTAL;
   const done = correctCount[currentMode];
   const pct = Math.round((done/total)*100);
   progressFill.style.setProperty("--p", pct);
@@ -307,6 +316,11 @@ const HERO = {
     title: "Chia động từ\nsang thể て.",
     sub: `Nhìn động từ thể ます rồi gõ romaji của thể て. Có ${て.length} câu, nộp bài để xem điểm và các câu cần ôn.`,
     steps: ["Nhìn động từ thể ます", "Gõ romaji của thể て", "Nhấn Enter để chuyển câu"]
+  },
+  kanji: {
+    title: "Học Kanji N5,\ngõ âm Hán Việt.",
+    sub: `Nhìn chữ Hán, gõ âm Hán Việt rồi nhấn Enter. Có ${countKana(KANJI)} chữ Kanji trình độ N5, kèm âm On/Kun để tham khảo.`,
+    steps: ["Nhìn chữ Kanji", "Gõ âm Hán Việt", "Nhấn Enter để kiểm tra"]
   }
 };
 
@@ -321,6 +335,7 @@ let orbShown = null;
 
 function orbPool(mode){
   if(mode === "teform") return [["て", "te"]];
+  if(mode === "kanji") return KANJI.n5.map(([k, a]) => [k, Array.isArray(a) ? a[0] : a]);
   const src = mode === "katakana" ? KATAKANA : HIRAGANA;
   return src.gojuon.map(([k, a]) => [k, Array.isArray(a) ? a[0] : a]);
 }
@@ -360,11 +375,15 @@ function setHero(mode, animate){
   orbNext();
 }
 const reduceMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-setInterval(orbNext, reduceMotion ? 4500 : 2800);
+if(!reduceMotion) setInterval(orbNext, 2800);
 
 /* ---------- Chuyển chế độ ---------- */
 const modeRow = document.getElementById("modeRow");
-const MODE_INDEX = { hiragana: 0, katakana: 1, teform: 2 };
+const MODE_INDEX = { hiragana: 0, katakana: 1, teform: 2, kanji: 3 };
+const allChip = document.querySelector('#filterControls .chip[data-filter="all"]');
+function updateAllChipLabel(mode){
+  if(allChip) allChip.textContent = `Tất cả (${MODE_TOTALS[mode] ?? TOTAL})`;
+}
 const topbarEl = document.getElementById("topbar");
 const toolbarToggle = document.getElementById("toolbarToggle");
 
@@ -389,6 +408,12 @@ document.querySelectorAll("#modeRow .mode-btn").forEach(btn=>{
 
       currentMode = btn.dataset.mode;
       topbarEl.classList.toggle("mode-teform", currentMode === "teform");
+      topbarEl.classList.toggle("mode-kanji", currentMode === "kanji");
+      currentFilter = "all";
+      document.querySelectorAll("#filterControls .chip[data-filter]").forEach(b=>{
+        b.classList.toggle("active", b.dataset.filter === "all");
+      });
+      updateAllChipLabel(currentMode);
       const newMain = document.getElementById(MODES[currentMode].mainId);
       newMain.classList.remove("hidden");
       newMain.classList.add("fade-out");
@@ -402,6 +427,7 @@ document.querySelectorAll("#modeRow .mode-btn").forEach(btn=>{
   });
 });
 setHero(currentMode, false);
+updateAllChipLabel(currentMode);
 
 /* ---------- Dock thu gọn khi cuộn ---------- */
 const dockSentinel = document.getElementById("dockSentinel");
