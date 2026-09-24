@@ -956,8 +956,7 @@ footer{max-width:1120px; margin:64px auto 0; padding:0 20px;}
 .card.revealed{border-color:rgba(139,108,255,.55); background:linear-gradient(145deg, rgba(139,108,255,.18), rgba(139,108,255,.05));}
 .card.revealed input{border-color:rgba(139,108,255,.55); color:var(--violet-2);}
 .card .fb.rv{color:var(--violet-2);}  border:1px solid var(--line);
-  border-radius:14px;
-}
+ 
 .tf-rv-q{font-family:var(--font-kana); font-weight:600; font-size:18px; color:var(--metal-1);}
 .tf-rv-a{font-family:var(--font-kana); font-weight:600; font-size:16px; color:var(--matcha); margin-top:2px;}
 .tf-rv-q small,
